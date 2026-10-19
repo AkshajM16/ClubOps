@@ -1,0 +1,108 @@
+type AuditNode {
+  id: Int!
+  actor: UserNode!
+  fromStatus: String!
+  toStatus: RequestStatus!
+  createdAt: DateTime!
+}
+
+type BudgetNode {
+  total: Decimal!
+  approved: Decimal!
+  remaining: Decimal!
+  pending: Decimal!
+}
+
+enum Category {
+  EVENTS
+  EQUIPMENT
+  TRAVEL
+  SUPPLIES
+  OTHER
+}
+
+input CreateRequestInput {
+  organizationId: Int!
+  title: String!
+  description: String!
+  amount: Decimal!
+  category: Category!
+  requestType: RequestType!
+}
+
+"""Date with time (isoformat)"""
+scalar DateTime
+
+"""Decimal (fixed-point)"""
+scalar Decimal
+
+type MemberNode {
+  user: UserNode!
+  role: Role!
+}
+
+type Mutation {
+  createRequest(input: CreateRequestInput!): RequestNode!
+  approveRequest(requestId: Int!): RequestNode!
+  rejectRequest(requestId: Int!): RequestNode!
+  cancelRequest(requestId: Int!): RequestNode!
+  updateApprovalThreshold(organizationId: Int!, threshold: Decimal!): OrganizationNode!
+}
+
+type OrganizationNode {
+  id: Int!
+  name: String!
+  approvalThreshold: Decimal!
+  myRole: Role!
+  budget: BudgetNode!
+  members: [MemberNode!]!
+}
+
+type Query {
+  me: UserNode
+  organizations: [OrganizationNode!]!
+  organization(organizationId: Int!): OrganizationNode!
+  requests(organizationId: Int!, status: RequestStatus = null, inboxOnly: Boolean! = false, limit: Int! = 50, offset: Int! = 0): [RequestNode!]!
+  request(requestId: Int!): RequestNode!
+}
+
+type RequestNode {
+  id: Int!
+  organizationId: Int!
+  title: String!
+  description: String!
+  amount: Decimal!
+  category: Category!
+  requestType: RequestType!
+  status: RequestStatus!
+  requiredRole: Role!
+  submitter: UserNode!
+  createdAt: DateTime!
+  canReview: Boolean!
+  canCancel: Boolean!
+  history: [AuditNode!]!
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum RequestType {
+  PURCHASE
+  REIMBURSEMENT
+}
+
+enum Role {
+  MEMBER
+  TREASURER
+  ADMIN
+}
+
+type UserNode {
+  id: Int!
+  username: String!
+  name: String!
+}

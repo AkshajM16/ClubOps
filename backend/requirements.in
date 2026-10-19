@@ -1,0 +1,6 @@
+Django>=5.2,<5.3
+strawberry-graphql>=0.280,<0.400
+psycopg[binary]>=3.2,<4
+gunicorn>=23,<24
+pytest>=8,<10
+pytest-django>=4.9,<5
