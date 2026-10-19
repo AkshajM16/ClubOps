@@ -26,7 +26,7 @@ Critical path: session login → membership query → submit request → authori
 
 - Repository inspected: supplied Zip directory was empty.
 - Plan recorded before implementation.
-- Milestones 1–5 pending.
+- Milestones 1–5 complete. Historical implementation updates follow; final handoff is at the end.
 
 ## Tests executed
 
@@ -59,3 +59,50 @@ Build foundation and services, verify the API, connect the frontend, then run re
 ## Remaining work
 
 Finish README, inspect final screenshots, verify Docker Compose if Docker Desktop starts, and record final validation/limitations. Package source without credentials, dependencies, or database files.
+
+## Milestone 5 — final handoff (October 19, 2026)
+
+All five milestones are implemented and verified. No placeholders, mock API responses, or unfinished core workflows remain.
+
+### Final executed verification
+
+| Check | Observed result |
+|---|---|
+| Native PostgreSQL backend suite | 52 passed in 18.74s; no warnings |
+| Backend suite inside Docker against PostgreSQL 17 | 52 passed in 24.65s |
+| Chromium workflows against Docker/Gunicorn/PostgreSQL | 2 passed in 4.2s |
+| TypeScript checks | Passed |
+| Frontend production build, native and Docker | Passed |
+| Fresh Docker Compose build/start/migrate/seed | Passed; all three services running |
+| Django system checks | No issues |
+| Migration drift check | No changes detected |
+| Schema/client regeneration diff | No drift |
+| Frontend formatting | Passed |
+| Backend Ruff checks | Passed |
+| npm dependency audit | 0 vulnerabilities |
+| Browser inspection of policy update/restore, insufficient budget, rejection, cancellation | Verified through real UI and database; no duplicate history on failed approval |
+| Axe WCAG A/AA scans of login, dashboard, settings, request list, details, create form | No detected violations after contrast improvements; not a claim of exhaustive accessibility certification |
+| Browser runtime errors during final screen inspection | None |
+| Mobile viewport | No document overflow at 390px; request amounts/statuses remain visible in a compact layout |
+
+The two maintained E2E tests remain intentionally focused. Extra one-time UI and accessibility inspections were run from workspace scratch scripts, not added as a large testing framework. Screenshots were captured from the real seeded backend and visually reviewed. Only the three exact requests created by browser verification were removed afterward; original demo records were preserved.
+
+### Delivered
+
+- Full source with pinned Python dependencies, npm lockfile, generated operations, migrations, Compose, and CI workflow.
+- README with tested setup commands, development-only demo credentials, API overview, testing commands, and limitations.
+- Architecture notes covering roles, policy snapshots, state machine, lock ordering, atomicity, and retry semantics.
+- Desktop, mobile, and request-history screenshots.
+- Incremental Git commits in the supplied project folder; portable source ZIP and Git history bundle in the chat outputs.
+
+### Environment at handoff
+
+The source repository is `/Users/akshaj/Desktop/Internship/Projects/Zip/clubops`. Docker Desktop and the `clubops` Compose stack are running. Open `http://localhost:5173` and use a documented demo account. The local ignored `.env` uses host PostgreSQL port **55433**; distributed `.env.example` defaults to **5432**. Django and Vite are on 8000 and 5173.
+
+A temporary native PostgreSQL cluster used for initial verification has been stopped; its scratch files remain under this chat's `work/` directory. Native Python/node development server processes were stopped when Compose took over.
+
+### Known limitations and remaining work
+
+No known blocker remains for the requested local MVP. Public deployment, login throttling, account provisioning, budget editing, and payment integrations are deliberately outside scope. Creation is not idempotent; terminal transitions are. Approvers may review their own submissions, as documented.
+
+No GitHub remote was configured, so the Actions workflow has not been executed on GitHub. Local equivalents and container checks passed. The next optional step is to create a remote repository, push `main`, and observe the hosted CI run; public deployment needs the configuration listed in README.

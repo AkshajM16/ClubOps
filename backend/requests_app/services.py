@@ -3,19 +3,20 @@
 from decimal import Decimal, InvalidOperation
 
 from core.errors import DomainError
+from django.contrib.auth.models import AnonymousUser, User
 from django.db import transaction
 from organizations.models import Membership, Organization, Role
 
 from .models import AuditEvent, Category, RequestType, SpendingRequest, Status
 
 
-def authenticated(user):
+def authenticated(user: User | AnonymousUser) -> User:
     if not user.is_authenticated:
         raise DomainError("Please sign in to continue.", "UNAUTHENTICATED")
     return user
 
 
-def membership(user, organization_id: int) -> Membership:
+def membership(user: User, organization_id: int) -> Membership:
     authenticated(user)
     result = (
         Membership.objects.select_related("organization", "user")
@@ -41,7 +42,7 @@ def money(value: Decimal) -> Decimal:
         ) from None
 
 
-def request_for_user(user, request_id: int) -> SpendingRequest:
+def request_for_user(user: User, request_id: int) -> SpendingRequest:
     authenticated(user)
     result = (
         SpendingRequest.objects.select_related("submitter", "organization")
@@ -62,7 +63,7 @@ def can_review(role: str, required_role: str) -> bool:
 
 @transaction.atomic
 def create_request(
-    user,
+    user: User,
     organization_id: int,
     title: str,
     description: str,
@@ -95,7 +96,7 @@ def create_request(
 
 
 @transaction.atomic
-def transition(user, request_id: int, target: str) -> SpendingRequest:
+def transition(user: User, request_id: int, target: str) -> SpendingRequest:
     # Resolve only through the user's memberships before locking. Organization is immutable.
     original = request_for_user(user, request_id)
     org = Organization.objects.select_for_update().get(pk=original.organization_id)
@@ -138,7 +139,7 @@ def transition(user, request_id: int, target: str) -> SpendingRequest:
 
 
 @transaction.atomic
-def update_threshold(user, organization_id: int, threshold: Decimal) -> Organization:
+def update_threshold(user: User, organization_id: int, threshold: Decimal) -> Organization:
     member = membership(user, organization_id)
     if member.role != Role.ADMIN:
         raise DomainError("Only admins can update the approval threshold.", "FORBIDDEN")
