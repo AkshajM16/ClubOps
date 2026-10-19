@@ -6,79 +6,206 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('organizations', '0001_initial'),
+        ("organizations", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SpendingRequest',
+            name="SpendingRequest",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=160)),
-                ('description', models.TextField(max_length=4000)),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=12)),
-                ('category', models.CharField(choices=[('EVENTS', 'Events'), ('EQUIPMENT', 'Equipment'), ('TRAVEL', 'Travel'), ('SUPPLIES', 'Supplies'), ('OTHER', 'Other')], max_length=12)),
-                ('request_type', models.CharField(choices=[('PURCHASE', 'Purchase'), ('REIMBURSEMENT', 'Reimbursement')], max_length=15)),
-                ('status', models.CharField(choices=[('PENDING', 'Pending'), ('APPROVED', 'Approved'), ('REJECTED', 'Rejected'), ('CANCELLED', 'Cancelled')], default='PENDING', max_length=10)),
-                ('required_role', models.CharField(choices=[('TREASURER', 'Treasurer'), ('ADMIN', 'Admin')], max_length=10)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='spending_requests', to='organizations.organization')),
-                ('submitter', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=160)),
+                ("description", models.TextField(max_length=4000)),
+                ("amount", models.DecimalField(decimal_places=2, max_digits=12)),
+                (
+                    "category",
+                    models.CharField(
+                        choices=[
+                            ("EVENTS", "Events"),
+                            ("EQUIPMENT", "Equipment"),
+                            ("TRAVEL", "Travel"),
+                            ("SUPPLIES", "Supplies"),
+                            ("OTHER", "Other"),
+                        ],
+                        max_length=12,
+                    ),
+                ),
+                (
+                    "request_type",
+                    models.CharField(
+                        choices=[
+                            ("PURCHASE", "Purchase"),
+                            ("REIMBURSEMENT", "Reimbursement"),
+                        ],
+                        max_length=15,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("PENDING", "Pending"),
+                            ("APPROVED", "Approved"),
+                            ("REJECTED", "Rejected"),
+                            ("CANCELLED", "Cancelled"),
+                        ],
+                        default="PENDING",
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "required_role",
+                    models.CharField(
+                        choices=[("TREASURER", "Treasurer"), ("ADMIN", "Admin")],
+                        max_length=10,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="spending_requests",
+                        to="organizations.organization",
+                    ),
+                ),
+                (
+                    "submitter",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at', '-pk'],
+                "ordering": ["-created_at", "-pk"],
             },
         ),
         migrations.CreateModel(
-            name='AuditEvent',
+            name="AuditEvent",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('from_status', models.CharField(blank=True, max_length=10)),
-                ('to_status', models.CharField(choices=[('PENDING', 'Pending'), ('APPROVED', 'Approved'), ('REJECTED', 'Rejected'), ('CANCELLED', 'Cancelled')], max_length=10)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('request', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='history', to='requests_app.spendingrequest')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("from_status", models.CharField(blank=True, max_length=10)),
+                (
+                    "to_status",
+                    models.CharField(
+                        choices=[
+                            ("PENDING", "Pending"),
+                            ("APPROVED", "Approved"),
+                            ("REJECTED", "Rejected"),
+                            ("CANCELLED", "Cancelled"),
+                        ],
+                        max_length=10,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "actor",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "request",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="history",
+                        to="requests_app.spendingrequest",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['created_at', 'pk'],
+                "ordering": ["created_at", "pk"],
             },
         ),
         migrations.AddIndex(
-            model_name='spendingrequest',
-            index=models.Index(fields=['organization', 'status', '-created_at'], name='requests_ap_organiz_ce9f96_idx'),
+            model_name="spendingrequest",
+            index=models.Index(
+                fields=["organization", "status", "-created_at"],
+                name="requests_ap_organiz_ce9f96_idx",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='spendingrequest',
-            constraint=models.CheckConstraint(condition=models.Q(('amount__gt', 0)), name='request_amount_positive'),
+            model_name="spendingrequest",
+            constraint=models.CheckConstraint(
+                condition=models.Q(("amount__gt", 0)), name="request_amount_positive"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='spendingrequest',
-            constraint=models.CheckConstraint(condition=models.Q(('status__in', ['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED'])), name='valid_request_status'),
+            model_name="spendingrequest",
+            constraint=models.CheckConstraint(
+                condition=models.Q(
+                    ("status__in", ["PENDING", "APPROVED", "REJECTED", "CANCELLED"])
+                ),
+                name="valid_request_status",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='spendingrequest',
-            constraint=models.CheckConstraint(condition=models.Q(('required_role__in', ['TREASURER', 'ADMIN'])), name='valid_required_role'),
+            model_name="spendingrequest",
+            constraint=models.CheckConstraint(
+                condition=models.Q(("required_role__in", ["TREASURER", "ADMIN"])),
+                name="valid_required_role",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='spendingrequest',
-            constraint=models.CheckConstraint(condition=models.Q(('category__in', ['EVENTS', 'EQUIPMENT', 'TRAVEL', 'SUPPLIES', 'OTHER'])), name='valid_category'),
+            model_name="spendingrequest",
+            constraint=models.CheckConstraint(
+                condition=models.Q(
+                    (
+                        "category__in",
+                        ["EVENTS", "EQUIPMENT", "TRAVEL", "SUPPLIES", "OTHER"],
+                    )
+                ),
+                name="valid_category",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='spendingrequest',
-            constraint=models.CheckConstraint(condition=models.Q(('request_type__in', ['PURCHASE', 'REIMBURSEMENT'])), name='valid_request_type'),
+            model_name="spendingrequest",
+            constraint=models.CheckConstraint(
+                condition=models.Q(("request_type__in", ["PURCHASE", "REIMBURSEMENT"])),
+                name="valid_request_type",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='auditevent',
-            constraint=models.UniqueConstraint(fields=('request', 'to_status'), name='unique_request_state_event'),
+            model_name="auditevent",
+            constraint=models.UniqueConstraint(
+                fields=("request", "to_status"), name="unique_request_state_event"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='auditevent',
-            constraint=models.CheckConstraint(condition=models.Q(models.Q(('from_status', ''), ('to_status', 'PENDING')), models.Q(('from_status', 'PENDING'), ('to_status__in', ['APPROVED', 'REJECTED', 'CANCELLED'])), _connector='OR'), name='valid_audit_transition'),
+            model_name="auditevent",
+            constraint=models.CheckConstraint(
+                condition=models.Q(
+                    models.Q(("from_status", ""), ("to_status", "PENDING")),
+                    models.Q(
+                        ("from_status", "PENDING"),
+                        ("to_status__in", ["APPROVED", "REJECTED", "CANCELLED"]),
+                    ),
+                    _connector="OR",
+                ),
+                name="valid_audit_transition",
+            ),
         ),
     ]

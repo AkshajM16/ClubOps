@@ -43,3 +43,19 @@ Build foundation and services, verify the API, connect the frontend, then run re
 - Frontend implemented: responsive login, dashboard, filtered/paginated requests, create/details/history, approval inbox, admin policy settings and team roles. Apollo operations generated from exported schema.
 - Executed: database migrations succeeded; seed command succeeded; Django system check reported no issues; GraphQL code generation succeeded.
 - Full test/build acceptance remains pending. npm installation reported dependency advisories; reviewing before final acceptance.
+
+## Milestone 4 — verified locally
+
+- Backend: `pytest backend/tests -q` — **52 passed**, including three forced-contention PostgreSQL tests (18.74 seconds on the final backend run so far).
+- `manage.py check` — no issues. `makemigrations --check --dry-run` — no changes.
+- Browser workflows: `npm run test:e2e` — **2 passed** (3.2 seconds), actual Django/PostgreSQL backend and Chromium; no mocks.
+- Browser verification covers incorrect credentials, member dashboard, organization isolation in the selector, mobile viewport width, read-only member settings, logout, request submission, treasurer inbox/approval, precise budget increment, persistent history, and terminal-state controls.
+- Initial browser failures exposed mobile overflow from an absolutely positioned hidden table heading and ambiguous form labels. Fixed the actual UI; both workflows now pass.
+- Replaced the GraphQL Codegen discovery CLI with the official core API and direct local inputs. Removed 187 unnecessary transitive packages; `npm audit` reports **0 vulnerabilities**. Updated generated operations for the current standalone operations plugin.
+- `npm run typecheck` passed after code-generation updates. Final build/format verification is in progress.
+- Backend format/import cleanup and per-request Strawberry extension factories applied; 52 backend tests reran without warnings. Ruff checks passed.
+- CI workflow implemented with PostgreSQL, schema drift checks, typecheck/build, and both E2E workflows. Not run on GitHub (no remote repository configured).
+
+## Remaining work
+
+Finish README, inspect final screenshots, verify Docker Compose if Docker Desktop starts, and record final validation/limitations. Package source without credentials, dependencies, or database files.

@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -15,28 +14,98 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Organization',
+            name="Organization",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=120, unique=True)),
-                ('total_budget', models.DecimalField(decimal_places=2, max_digits=12)),
-                ('approved_spending', models.DecimalField(decimal_places=2, default=0, max_digits=12)),
-                ('approval_threshold', models.DecimalField(decimal_places=2, default=500, max_digits=12)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=120, unique=True)),
+                ("total_budget", models.DecimalField(decimal_places=2, max_digits=12)),
+                (
+                    "approved_spending",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=12),
+                ),
+                (
+                    "approval_threshold",
+                    models.DecimalField(decimal_places=2, default=500, max_digits=12),
+                ),
             ],
             options={
-                'constraints': [models.CheckConstraint(condition=models.Q(('total_budget__gte', 0)), name='budget_nonnegative'), models.CheckConstraint(condition=models.Q(('approved_spending__gte', 0), ('approved_spending__lte', models.F('total_budget'))), name='spending_within_budget'), models.CheckConstraint(condition=models.Q(('approval_threshold__gt', 0)), name='threshold_positive')],
+                "constraints": [
+                    models.CheckConstraint(
+                        condition=models.Q(("total_budget__gte", 0)),
+                        name="budget_nonnegative",
+                    ),
+                    models.CheckConstraint(
+                        condition=models.Q(
+                            ("approved_spending__gte", 0),
+                            ("approved_spending__lte", models.F("total_budget")),
+                        ),
+                        name="spending_within_budget",
+                    ),
+                    models.CheckConstraint(
+                        condition=models.Q(("approval_threshold__gt", 0)),
+                        name="threshold_positive",
+                    ),
+                ],
             },
         ),
         migrations.CreateModel(
-            name='Membership',
+            name="Membership",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('role', models.CharField(choices=[('MEMBER', 'Member'), ('TREASURER', 'Treasurer'), ('ADMIN', 'Admin')], max_length=10)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='memberships', to=settings.AUTH_USER_MODEL)),
-                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='memberships', to='organizations.organization')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "role",
+                    models.CharField(
+                        choices=[
+                            ("MEMBER", "Member"),
+                            ("TREASURER", "Treasurer"),
+                            ("ADMIN", "Admin"),
+                        ],
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="memberships",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="memberships",
+                        to="organizations.organization",
+                    ),
+                ),
             ],
             options={
-                'constraints': [models.UniqueConstraint(fields=('organization', 'user'), name='unique_membership'), models.CheckConstraint(condition=models.Q(('role__in', ['MEMBER', 'TREASURER', 'ADMIN'])), name='valid_membership_role')],
+                "constraints": [
+                    models.UniqueConstraint(
+                        fields=("organization", "user"), name="unique_membership"
+                    ),
+                    models.CheckConstraint(
+                        condition=models.Q(("role__in", ["MEMBER", "TREASURER", "ADMIN"])),
+                        name="valid_membership_role",
+                    ),
+                ],
             },
         ),
     ]

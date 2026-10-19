@@ -1,0 +1,115 @@
+fragment RequestFields on RequestNode {
+  id
+  organizationId
+  title
+  description
+  amount
+  category
+  requestType
+  status
+  requiredRole
+  submitter {
+    id
+    name
+    username
+  }
+  createdAt
+  canReview
+  canCancel
+}
+query Workspace {
+  me {
+    id
+    name
+    username
+  }
+  organizations {
+    id
+    name
+    approvalThreshold
+    myRole
+  }
+}
+query Organization($organizationId: Int!) {
+  organization(organizationId: $organizationId) {
+    id
+    name
+    approvalThreshold
+    myRole
+    budget {
+      total
+      approved
+      pending
+      remaining
+    }
+    members {
+      user {
+        id
+        name
+        username
+      }
+      role
+    }
+  }
+}
+query Requests(
+  $organizationId: Int!
+  $status: RequestStatus
+  $inboxOnly: Boolean! = false
+  $limit: Int! = 50
+  $offset: Int! = 0
+) {
+  requests(
+    organizationId: $organizationId
+    status: $status
+    inboxOnly: $inboxOnly
+    limit: $limit
+    offset: $offset
+  ) {
+    ...RequestFields
+  }
+}
+query Request($requestId: Int!) {
+  request(requestId: $requestId) {
+    ...RequestFields
+    history {
+      id
+      actor {
+        id
+        name
+      }
+      fromStatus
+      toStatus
+      createdAt
+    }
+  }
+}
+mutation CreateRequest($input: CreateRequestInput!) {
+  createRequest(input: $input) {
+    ...RequestFields
+  }
+}
+mutation ApproveRequest($requestId: Int!) {
+  approveRequest(requestId: $requestId) {
+    ...RequestFields
+  }
+}
+mutation RejectRequest($requestId: Int!) {
+  rejectRequest(requestId: $requestId) {
+    ...RequestFields
+  }
+}
+mutation CancelRequest($requestId: Int!) {
+  cancelRequest(requestId: $requestId) {
+    ...RequestFields
+  }
+}
+mutation UpdateThreshold($organizationId: Int!, $threshold: Decimal!) {
+  updateApprovalThreshold(
+    organizationId: $organizationId
+    threshold: $threshold
+  ) {
+    id
+    approvalThreshold
+  }
+}

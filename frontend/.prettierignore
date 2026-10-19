@@ -1,0 +1,5 @@
+node_modules
+dist
+src/graphql/generated.ts
+playwright-report
+test-results
